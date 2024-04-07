@@ -36,9 +36,9 @@ void Betoneira::Logger::init() {
 std::filesystem::path Betoneira::Logger::logsPath{ "logs" };
 std::stringstream Betoneira::Logger::logData = {};
 
-void Betoneira::Logger::log(std::initializer_list<std::string> args, std::initializer_list<std::string> context) {
-    std::stringstream logMessage;
-
+std::string Betoneira::Logger::getFormattedTime() {
+    std::stringstream formatted;
+    
     std::tm timeNow;
     {
         std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
@@ -52,26 +52,37 @@ void Betoneira::Logger::log(std::initializer_list<std::string> args, std::initia
             localtime_s(&timeNow, &time_tNow);
     }
 
-    logMessage << '[';
+    formatted << '[';
 
     if (logYearMonthDay)
-        logMessage << timeNow.tm_year + 1900
-            << "-" << timeNow.tm_mon + 1
-            << "-" << timeNow.tm_yday - timeNow.tm_mon * 30;
+        formatted << timeNow.tm_year + 1900
+        << "-" << timeNow.tm_mon + 1
+        << "-" << timeNow.tm_yday - timeNow.tm_mon * 30;
 
     if (logTime)
     {
-        logMessage << " " << timeNow.tm_hour << ":" << timeNow.tm_min;
+        formatted << " " << timeNow.tm_hour << ":" << timeNow.tm_min;
         if (logTimeSecond)
-        logMessage << ":" << timeNow.tm_sec;
+            formatted << ":" << timeNow.tm_sec;
     }
 
-    logMessage << "]";
+    formatted << "]";
 
+    return formatted.str();
+}
+
+std::string Betoneira::Logger::getFormattedContext(std::initializer_list<std::string> context) {
+    std::stringstream formatted;
     for (std::string ctx : context)
-        logMessage << "[" << ctx << "]";
+        formatted << "[" << ctx << "]";
 
-    logMessage << " ";
+    return formatted.str();
+}
+
+void Betoneira::Logger::log(std::initializer_list<std::string> args, std::initializer_list<std::string> context) {
+    std::stringstream logMessage;
+
+    logMessage << getFormattedTime() << getFormattedContext(context) << " ";
 
     for (std::string arg : args)
         logMessage << arg;

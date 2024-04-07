@@ -22,4 +22,7 @@ namespace Betoneira::Logger {
 	void log(std::initializer_list<std::string> args, std::initializer_list<std::string> context = {});
 	// saves logData and clears it
 	Betoneira::Status saveToFile(std::string file, bool appendMode=false);
+
+	std::string getFormattedTime();
+	std::string getFormattedContext(std::initializer_list<std::string> context);
 }
